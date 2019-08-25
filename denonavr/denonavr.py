@@ -334,6 +334,28 @@ class DenonAVR:
             else:
                 return root
 
+    def exec_appcommand0300_post(self, xml_lookup):
+        """
+        Prepare and execute a HTTP POST call to AppCommand.xml end point.
+
+        Returns XML ElementTree on success and None on fail.
+        """
+        # To do - find best approach to generate and POST XML that includes
+        # some namespaces.  Here is a working example to test:
+
+        #<?xml version="1.0" encoding="utf-8"?>
+        #    <tx>
+        #    <cmd id="3">
+        #        <name>SetAudyssey</name>
+        #       <list>
+        #            <param name="dynamicvol">0</param>
+        #        </list>
+        #    </cmd>
+        #    </tx>
+        
+        # Note that the value in <param name="dynamicvol"> can be set to
+        # 0 (off), 1 (light), 2 (medium), and 3 (heavy).
+        
     def get_status_xml(self, command, suppress_errors=False):
         """Get status XML via HTTP and return it as XML ElementTree."""
         # Get XML structure via HTTP get
