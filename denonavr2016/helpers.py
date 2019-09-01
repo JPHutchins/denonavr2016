@@ -12,7 +12,7 @@ class XmlCommand1:
     The commands all have cmd_id=1 and AppCommand.xml as endpoint.
     """
     def __init__(self, friendly_name, cmd_id_text, bounds, name=None,
-                 zone=None, values=None):
+                 values=None):
         """
         The constructor for the XmlCommand1 class.
 
@@ -21,8 +21,6 @@ class XmlCommand1:
             cmd_id_text (string): text between <cmd id=1> and </cmd>
             bounds (tuple(int, int)): the (lower, upper) bounds of the command.
             name (string): The paramater name according to Denon API, defaults to
-                None.
-            zone (string): The paramater zone according to Denon API, defaults to
                 None.
             values (list[strings]): A list indexed by the integer value expected by
                 the Denon API containing the friendly names associated with each
@@ -37,7 +35,6 @@ class XmlCommand1:
         self.cmd_id_text = cmd_id_text
         self.bounds = bounds
         self.name = name
-        self.zone = zone
         self.values = values
         if values:
             self.value_dict = {}
@@ -103,7 +100,7 @@ class XmlCommand3:
                 decibel += 0.5
 
 
-def make_xml_command(command, value):
+def make_xml_command(command, value, zone=None):
     """
     Package a command and value into XML for the Denon API.
 
@@ -124,7 +121,7 @@ def make_xml_command(command, value):
             xml_name.text = command.name
         if command.zone:
             xml_zone = ET.SubElement(xml_root, "zone")
-            xml_zone.text = command.zone
+            xml_zone.text = zone
 
     elif command.cmd_id is "3":
         xml_name = ET.SubElement(xml_cmd_id, "name")
