@@ -109,7 +109,7 @@ def make_xml_command(command, value, zone=None):
         command (XmlCommand): An instance of the XmlCommand1 or XmlCommand3
             class.
         value (string): The value that the command is to bet set to.
-        zone (string): The zone to apply the command to.  Defalts to None.
+        zone (string): The zone to apply the command to. Defalts to None.
             Valid entries: "Main" "Zone1" Zone2" etc.
 
     Returns:
@@ -155,9 +155,9 @@ def make_xml_command(command, value, zone=None):
                 logging.warning(
                     "Value too high, clipped to %d.", command.bounds[1])
         except TypeError:
-            valid = "\n    ".join(key for key in command.value_dict)
+            valid = ", ".join(key for key in command.value_dict)
             logging.error(
-                "Value not in value_dict. Valid keys are:\n    %s", valid)
+                "Value not in value_dict. Valid keys are: %s", valid)
             return
 
     return ET.tostring(xml_root, encoding='utf8', method='xml')
