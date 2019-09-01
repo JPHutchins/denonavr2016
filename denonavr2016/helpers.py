@@ -6,6 +6,7 @@ Classes and functions for denonavr.
 
 import xml.etree.ElementTree as ET
 import logging
+import re
 
 class XmlCommand1:
     """
@@ -18,12 +19,13 @@ class XmlCommand1:
         The constructor for the XmlCommand1 class.
 
         Attributes:
+
             friendly_name (string): The friendly name of the command.
             cmd_id_text (string): text between <cmd id=1> and </cmd>
             bounds (tuple(int, int)): the (lower, upper) bounds of the command.
             name (string): The paramater name according to Denon API, defaults to
                 None.
-            values (list[strings]): A list indexed by the integer value expected by
+            values (list ["string"]): A list indexed by the integer value expected by
                 the Denon API containing the friendly names associated with each
                 value. For example ["Off", "On"]. Defaults to None.
 
@@ -64,6 +66,7 @@ class XmlCommand3:
         The constructor for the XmlCommand3 class.
 
         Attributes:
+        
             friendly_name (string): The friendly name of the command.
             name (string): name according to Denon API.
             bounds (tuple(int, int)): the (lower, upper) bounds of the command.
@@ -143,6 +146,8 @@ def make_xml_command(command, value, zone=None):
         xml_value.text = command.value_dict[value]
     except (AttributeError, KeyError):
         try:
+            if re.match(r'-?\d+\Z', str(value)):
+                value = int(value)
             if value >= command.bounds[0] and\
                 value <= command.bounds[1]:
                 xml_value.text = str(value)

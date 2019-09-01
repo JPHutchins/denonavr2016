@@ -104,6 +104,10 @@ b'<?xml version=\'1.0\' encoding=\'utf8\'?>\n\
 b'<?xml version=\'1.0\' encoding=\'utf8\'?>\n\
 <tx><cmd id="3"><name>SetSurroundParameter</name><list>\
 <param name="lfe">-5</param></list></cmd></tx>')
+        self.assertEqual(make_xml_command(SET_LFE, "-5"),
+b'<?xml version=\'1.0\' encoding=\'utf8\'?>\n\
+<tx><cmd id="3"><name>SetSurroundParameter</name><list>\
+<param name="lfe">-5</param></list></cmd></tx>')
 
 #------------------------------------------------------------------------------
 #   CMD_ID=1 SYNTAX
