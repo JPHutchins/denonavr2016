@@ -5,6 +5,7 @@ Classes and functions for denonavr.
 """
 
 import xml.etree.ElementTree as ET
+import logging
 
 class XmlCommand1:
     """
@@ -40,7 +41,7 @@ class XmlCommand1:
             self.value_dict = {}
             for number, key in enumerate(self.values):
                 self.value_dict[key] = str(number)
-        
+
         elif bounds[0] is 0 and bounds[1] is 48:
             self.value_dict = {}
             decibel = -12
@@ -72,9 +73,9 @@ class XmlCommand3:
                 the Denon API containing the friendly names associated with each
                 value. For example ["Off", "On"]. Defaults to None.
 
-            If the values attribute was provided then the constructor will
-            translate those fields into a dictionary so that the integer value can
-            be accessed by referring to the friendly name of the command.
+        If the values attribute was provided then the constructor will
+        translate those fields into a dictionary so that the integer value can
+        be accessed by referring to the friendly name of the command.
         """
         self.friendly_name = friendly_name
         self.cmd_id = "3"
@@ -87,7 +88,7 @@ class XmlCommand3:
             self.value_dict = {}
             for number, key in enumerate(self.values):
                 self.value_dict[key] = str(number)
-        
+
         elif bounds[0] is 0 and bounds[1] is 48:
             self.value_dict = {}
             decibel = -12
@@ -105,44 +106,58 @@ def make_xml_command(command, value, zone=None):
     Package a command and value into XML for the Denon API.
 
     Args:
-        command (XmlCommand): An instance of the XmlCommand class.
+        command (XmlCommand): An instance of the XmlCommand1 or XmlCommand3
+            class.
         value (string): The value that the command is to bet set to.
+        zone (string): The zone to apply the command to.  Defalts to None.
+            Valid entries: "Main" "Zone1" Zone2" etc.
 
     Returns:
-        bytes: UTF-8 encoded XML string ready to POST.
+        bytes: UTF-8 encoded XML with header ready to POST.
     """
     xml_root = ET.Element("tx")
     xml_cmd_id = ET.SubElement(xml_root, "cmd", {"id": command.cmd_id})
 
-    if command.cmd_id is "1":
+    if command.cmd_id is "1": #AppCommand.xml endpoint
         xml_cmd_id.text = command.cmd_id_text
         if command.name:
             xml_name = ET.SubElement(xml_root, "name")
             xml_name.text = command.name
-        if command.zone:
+        if zone:
             xml_zone = ET.SubElement(xml_root, "zone")
             xml_zone.text = zone
+        xml_value = ET.SubElement(xml_root, "value")
 
-    elif command.cmd_id is "3":
+    elif command.cmd_id is "3": #AppCommand0300.xml endpoint
         xml_name = ET.SubElement(xml_cmd_id, "name")
         xml_name.text = command.name
+
         if command.param:
             xml_list = ET.SubElement(xml_cmd_id, "list")
-            xml_param = ET.SubElement(xml_list, "param", {"name": command.param})
-            try:
-                xml_param.text = command.value_dict[value]
-            except (AttributeError, KeyError):
-                xml_param.text = str(value)
-            return ET.tostring(xml_root, encoding='utf8', method='xml')
-    
-    if command.cmd_id is "1":
-        xml_value = ET.SubElement(xml_root, "value")
-    elif command.cmd_id is "3":
-        xml_value = ET.SubElement(xml_cmd_id, "value")
+            xml_value = ET.SubElement(xml_list, "param",
+                                      {"name": command.param})
+        else:
+            xml_value = ET.SubElement(xml_cmd_id, "value")
 
     try:
         xml_value.text = command.value_dict[value]
     except (AttributeError, KeyError):
-        xml_value.text = str(value)
+        try:
+            if value >= command.bounds[0] and\
+                value <= command.bounds[1]:
+                xml_value.text = str(value)
+            elif value <= command.bounds[0]:
+                xml_value.text = str(command.bounds[0])
+                logging.warning(
+                    "Value too low, clipped to %d.", command.bounds[0])
+            elif value >= command.bounds[1]:
+                xml_value.text = str(command.bounds[1])
+                logging.warning(
+                    "Value too high, clipped to %d.", command.bounds[1])
+        except TypeError:
+            valid = "\n    ".join(key for key in command.value_dict)
+            logging.error(
+                "Value not in value_dict. Valid keys are:\n    %s", valid)
+            return
 
     return ET.tostring(xml_root, encoding='utf8', method='xml')
