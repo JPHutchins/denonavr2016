@@ -19,3 +19,4 @@ SET_DYNAMIC_VOL = XmlCommand(
 SET_LFE = XmlCommand(
     "LFE Level", "3", "SetSurroundParameter",
     (-10, 0), param="lfe")
+    
