@@ -51,19 +51,20 @@ def make_xml_command(command, value):
         value (string): The value that the command is to bet set to.
 
     Returns:
-        string: Formatted XML string ready to POST.
+        bytes: UTF-8 encoded XML string ready to POST.
     """
     xml_root = ET.Element("tx")
+
     xml_cmd_id = ET.SubElement(xml_root, "cmd", {"id": command.cmd_id})
     xml_name = ET.SubElement(xml_cmd_id, "name")
     xml_name.text = command.name
-
+    
     if command.param:
         xml_list = ET.SubElement(xml_cmd_id, "list")
         xml_param = ET.SubElement(xml_list, "param", {"name": command.param})
         try:
             xml_param.text = command.value_dict[value]
-        except KeyError:
+        except (AttributeError, KeyError):
             xml_param.text = str(value)
     else:
         xml_value = ET.SubElement(xml_cmd_id, "value")
@@ -72,4 +73,4 @@ def make_xml_command(command, value):
         except KeyError:
             xml_value.txt = str(value)
 
-    return ET.dump(xml_root)
+    return ET.tostring(xml_root, encoding='utf8', method='xml')
