@@ -5,10 +5,10 @@ This module contains instances of the XmlCommand class that are representations
 of the Denon AVR 2016 XML command structure.  Refer to ./XML_data_dump.txt for
 more information or to find out how to sniff commands on your own AVR.
 """
-from .helpers import XmlCommand
+from .helpers import XmlCommand1, XmlCommand3
 
-SET_DYNAMIC_VOL = XmlCommand(
-    "Dynamic Volume", "3", "SetAudyssey",
+SET_DYNAMIC_VOL = XmlCommand3(
+    "Dynamic Volume", "SetAudyssey",
     (0, 3), param="dynamicvol",
     values=[
         "Off",
@@ -16,7 +16,6 @@ SET_DYNAMIC_VOL = XmlCommand(
         "Medium",
         "Heavy"]
 )
-SET_LFE = XmlCommand(
-    "LFE Level", "3", "SetSurroundParameter",
+SET_LFE = XmlCommand3(
+    "LFE Level", "SetSurroundParameter",
     (-10, 0), param="lfe")
-    
